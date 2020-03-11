@@ -25,4 +25,8 @@ public class Book {
     private Float price;
     //描述
     private String desc;
+    //粉丝列表
+    private List<String> fans;
+    //每月排名
+    private Map<String,Integer> rank;
 }
