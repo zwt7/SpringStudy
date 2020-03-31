@@ -29,54 +29,56 @@ import java.util.UUID;
 @RestController
 public class FileController {
     @PostMapping("/upload")
-    public String upload(MultipartFile file, HttpServletRequest request){
-        String format= LocalDate.now().format(DateTimeFormatter.ofPattern("/yyyy/MM/dd"));
-        String realPth=request.getServletContext().getRealPath("/img")+format;
-        File folder=new File(realPth);
-        if(!folder.exists()){
-            folder.mkdirs();
-        }
-        String oldName=file.getOriginalFilename();
-        String newName= UUID.randomUUID().toString()+oldName.substring(oldName.lastIndexOf("."));
-        try {
-            file.transferTo(new File(folder, newName));
-            String url=request.getScheme()+"://"+request.getServerName()+":"
-                    +request.getServerPort()+":img"+format+newName;
-            return url;
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            throw new CustomException(ExceptionType.OTHER_ERROR.getCode(),e.getMessage());
-        }
-    }
-    @PostMapping("/uploads")
-    public String upload(MultipartFile[] files, HttpServletRequest request) {
+    public String upload(MultipartFile file, HttpServletRequest request) {
         String format = LocalDate.now().format(DateTimeFormatter.ofPattern("/yyyy/MM/dd/"));
         String realPath = request.getServletContext().getRealPath("/img") + format;
         File folder = new File(realPath);
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        for (MultipartFile file : files) {
-            String oldName = file.getOriginalFilename();
-            String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
+//        修改文件名
+        String oldName = file.getOriginalFilename();
+        String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
 
-            try {
-                file.transferTo(new File(folder, newName));
-                String url = request.getScheme() + "://" + request.getServerName() + ":"
-                        + request.getServerPort() + "/img" + format + newName;
-                System.out.println(url);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new CustomException(ExceptionType.OTHER_ERROR.getCode(), e.getMessage());
-            }
+        try {
+//            保存文件
+            file.transferTo(new File(folder, newName));
+            String url = request.getScheme() + "://" + request.getServerName() + ":"
+                    + request.getServerPort() + "/img" + format + newName;
+            return url;
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CustomException(ExceptionType.OTHER_ERROR.getCode(), e.getMessage());
         }
-        return "success";
     }
-
+//    @PostMapping("/uploads")
+//    public String upload(MultipartFile[] files, HttpServletRequest request) {
+//        String format = LocalDate.now().format(DateTimeFormatter.ofPattern("/yyyy/MM/dd/"));
+//        String realPath = request.getServletContext().getRealPath("/img") + format;
+//        File folder = new File(realPath);
+//        if (!folder.exists()) {
+//            folder.mkdirs();
+//        }
+//        for (MultipartFile file : files) {
+//            String oldName = file.getOriginalFilename();
+//            String newName = UUID.randomUUID().toString() + oldName.substring(oldName.lastIndexOf("."));
+//
+//            try {
+//                file.transferTo(new File(folder, newName));
+//                String url = request.getScheme() + "://" + request.getServerName() + ":"
+//                        + request.getServerPort() + "/img" + format + newName;
+//                System.out.println(url);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                throw new CustomException(ExceptionType.OTHER_ERROR.getCode(), e.getMessage());
+//            }
+//        }
+//        return "success";
+//    }
+//
     @Value("${file.download.root.dir}")
     private String dirPath;
-    @GetMapping("/download{filename}")
+    @GetMapping("/download/{filename}")
     public ResponseEntity<byte[]> fileDownload(@PathVariable String filename,
                                                HttpServletRequest request){
         File file=new File(dirPath,filename);
