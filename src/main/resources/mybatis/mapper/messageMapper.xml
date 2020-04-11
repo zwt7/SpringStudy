@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spring.mybatis.demo.mybatis_xml.mapper.MessageMapper">
+    <resultMap id="BaseResultMap" type="com.spring.mybatis.demo.mybatis_xml.model.Message">
+        <id column="msg_id" property="msgId" jdbcType="BIGINT"/>
+        <result column="msg_text" property="msgText" jdbcType="VARCHAR"/>
+        <result column="msg_summary" property="msgSummary" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        msg_id,msg_text,msg_summary
+    </sql>
+    <insert id="insert" parameterType="com.spring.mybatis.demo.mybatis_xml.model.Message">
+        insert into message(msg_text,msg_summary) value(#{msgText},#{msgSummary})
+    </insert>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select * from  message
+    </select>
+    <select id="selectById" parameterType="Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM message
+        WHERE msg_id=#{msgId}
+    </select>
+    <update id="update" parameterType="com.spring.mybatis.demo.mybatis_xml.model.Message">
+        UPDATE message SET
+        <if test="msgText!=null">msg_text=#{msgText},</if>
+        <if test="msgSummary!=null">msg_summary=#{msgSummary}</if>
+        WHERE msg_id=#{msgId}
+    </update>
+    <insert id="batchInsert" parameterType="com.spring.mybatis.demo.mybatis_xml.model.Message">
+        INSERT INTO message (msg_text,msg_summary) VALUES
+        <foreach collection="list" item="msg" index="index" separator=",">
+            (#{msg.msgText},#{msg.msgSummary})
+        </foreach>
+    </insert>
+    <delete id="delete" parameterType="Integer">
+        DELETE FROM message WHERE msg_id=#{msgId}
+    </delete>
+    <update id="updateText" parameterType="com.spring.mybatis.demo.mybatis_xml.model.Message">
+        UPDATE message
+        <set>
+            <if test="msgText !=null and msgText!=''">msg_text=#{msgText}</if>
+            <if test="msgSummary!=null and msgSummary!=''">msg_summary=#{msgSummary}</if>
+        </set>
+        WHERE msg_id=#{msgId}
+    </update>
+</mapper>
+
